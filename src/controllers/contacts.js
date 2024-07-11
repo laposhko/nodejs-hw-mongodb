@@ -7,7 +7,7 @@ import {
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
 
-export const getAllContactsController = async (req, res, next) => {
+export const getAllContactsController = async (req, res) => {
   const contacts = await getAllContacts();
   res.json({
     status: 200,
@@ -53,7 +53,7 @@ export const deleteContactController = async (req, res, next) => {
   });
 };
 
-export const upsertContactController = async (req, res) => {
+export const upsertContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const result = await upsertContact(contactId, req.body, { upsert: true });
   if (!result) {
@@ -67,7 +67,7 @@ export const upsertContactController = async (req, res) => {
   });
 };
 
-export const patchContactController = async (req, res) => {
+export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const result = await upsertContact(contactId, req.body);
   if (!result) {
