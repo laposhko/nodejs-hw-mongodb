@@ -1,4 +1,4 @@
-import { ContactsCollection } from '../db/models/contact.js';
+import { ContactsCollection } from "../db/models/contact.js";
 
 export const getAllContacts = async () => {
   const contacts = await ContactsCollection.find();
@@ -30,7 +30,7 @@ export const upsertContact = async (contactId, payload, options = {}) => {
       new: true,
       includeResultMetadata: true,
       ...options,
-    },
+    }
   );
 
   if (!rawResult || !rawResult.value) return null;
