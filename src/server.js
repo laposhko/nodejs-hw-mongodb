@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'pino-http';
+// import pino from 'pino-http';
 import env from './utils/env.js';
 import { initMongoDB } from './db/initMongoDB.js';
 import contactsRouter from './routers/contacts.js';
@@ -8,13 +8,11 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 const PORT = Number(env('PORT', '3000'));
-
-// const { PORT = 3000 } = process.env;
 function setupServer() {
   initMongoDB();
   const app = express();
-  const logger = pino({ transport: { target: 'pino-pretty' } });
-  app.use(logger);
+  // const logger = pino({ transport: { target: 'pino-pretty' } });
+  // app.use(logger);
   app.use(cors());
   app.use(express.json());
 

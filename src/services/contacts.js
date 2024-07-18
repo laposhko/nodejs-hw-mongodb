@@ -1,8 +1,43 @@
-import { ContactsCollection } from "../db/models/contact.js";
+import { ContactsCollection } from '../db/models/contact.js';
+import { calcPaginationData } from '../utils/calcPaginationData.js';
+export const getAllContacts = async ({
+  page,
+  perPage,
+  sortBy,
+  sortOrder,
+  filter,
+}) => {
+  const skip = (page - 1) * perPage;
+  const databaseQuery = ContactsCollection.find();
+  if (filter.type) {
+    databaseQuery.where('contactType').equals(filter.type);
+  }
+  if (filter.isFavorite) {
+    databaseQuery.where('isFavorite').equals(filter.isFavorite);
+  }
+  const contacts = await databaseQuery
+    .find()
+    .skip(skip)
+    .limit(perPage)
+    .sort({ [sortBy]: sortOrder });
 
-export const getAllContacts = async () => {
-  const contacts = await ContactsCollection.find();
-  return contacts;
+  const totalItems = await ContactsCollection.find()
+    .merge(databaseQuery)
+    .countDocuments();
+  const { totalPages, hasNextPage, hasPrevPage } = calcPaginationData({
+    totalItems,
+    page,
+    perPage,
+  });
+  return {
+    contacts,
+    totalItems,
+    page,
+    perPage,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+  };
 };
 
 export const getContactById = async (contactId) => {
@@ -27,10 +62,9 @@ export const upsertContact = async (contactId, payload, options = {}) => {
     { _id: contactId },
     payload,
     {
-      new: true,
       includeResultMetadata: true,
       ...options,
-    }
+    },
   );
 
   if (!rawResult || !rawResult.value) return null;
