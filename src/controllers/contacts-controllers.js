@@ -11,7 +11,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseContactFilterParams } from '../utils/parseContactFilterParams.js';
 // import { createContactSchema } from '../validation/contacts.js';
 
-export const getAllContactsController = async (req, res) => {
+export const getAllContactsController = async (req, res, next) => {
   const { normalizedPage: page, normalizedPerPage: perPage } =
     parsePaginationParams(req.query);
   const { parsedSortBy: sortBy, parsedSortOrder: sortOrder } = parseSortParams(
@@ -25,6 +25,10 @@ export const getAllContactsController = async (req, res) => {
     sortOrder,
     filter,
   });
+  if (page > data.totalPages) {
+    next(createHttpError(404, 'Page not found'));
+    return;
+  }
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
