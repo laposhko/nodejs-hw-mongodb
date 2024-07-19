@@ -6,14 +6,14 @@ import {
   deleteContactController,
   upsertContactController,
   patchContactController,
-} from '../controllers/contacts.js';
+} from '../controllers/contacts-controllers.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../utils/validateBody.js';
 // import { validateBody } from '../middlewares/validateBody.js';
 import {
   createContactSchema,
   updateContactSchema,
-} from '../validation/contacts.js';
+} from '../validation/contacts-validation.js';
 import isValidId from '../middlewares/isValidId.js';
 
 const contactsRouter = Router();

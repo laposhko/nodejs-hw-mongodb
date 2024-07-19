@@ -4,7 +4,7 @@ import {
   createContact,
   deleteContact,
   upsertContact,
-} from '../services/contacts.js';
+} from '../services/contacts-services.js';
 import createHttpError from 'http-errors';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
@@ -47,9 +47,6 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
-  // const validationResult = await createContactSchema.validateAsync(req.body, {
-  //   abortEarly: false,
-  // });
   const contact = await createContact(req.body);
   res.status(201).json({
     status: 201,

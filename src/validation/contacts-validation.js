@@ -35,7 +35,7 @@ export const createContactSchema = Joi.object({
   //   'string.max': 'Email address cannot be longer than 20 characters',
   //   'string.email': 'Email address is incorrect format',
   // }),
-  isFavorite: Joi.boolean().required(),
+  isFavorite: Joi.boolean(),
   // .messages({
   //   'any.required': 'This field is required',
   // }),

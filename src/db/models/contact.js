@@ -1,11 +1,11 @@
 import { model, Schema } from 'mongoose';
-import { mongooseSaveError } from './hooks.js';
+import { mongooseSaveError } from '../hooks.js';
 import {
   contactTypes,
   emailRegexp,
   numberRegexp,
 } from '../../constants/contacts-constants.js';
-import { setUpdateSettings } from './hooks.js';
+import { setUpdateSettings } from '../hooks.js';
 
 const contactSchema = new Schema(
   {
@@ -16,7 +16,7 @@ const contactSchema = new Schema(
       required: false,
       match: emailRegexp,
     },
-    isFavorite: { type: Boolean, required: true, default: false },
+    isFavorite: { type: Boolean, default: false },
     contactType: {
       type: String,
       required: true,

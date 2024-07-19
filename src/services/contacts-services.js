@@ -15,15 +15,13 @@ export const getAllContacts = async ({
   if (filter.isFavorite) {
     databaseQuery.where('isFavorite').equals(filter.isFavorite);
   }
-  const contacts = await databaseQuery
-    .find()
-    .skip(skip)
-    .limit(perPage)
-    .sort({ [sortBy]: sortOrder });
-
   const totalItems = await ContactsCollection.find()
     .merge(databaseQuery)
     .countDocuments();
+  const contacts = await databaseQuery
+    .skip(skip)
+    .limit(perPage)
+    .sort({ [sortBy]: sortOrder });
   const { totalPages, hasNextPage, hasPrevPage } = calcPaginationData({
     totalItems,
     page,
