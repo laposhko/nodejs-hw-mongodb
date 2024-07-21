@@ -1,11 +1,10 @@
 import { model, Schema } from 'mongoose';
-import { mongooseSaveError } from '../hooks.js';
+import { mongooseSaveError, setUpdateSettings } from '../hooks.js';
 import {
   contactTypes,
   emailRegexp,
   numberRegexp,
 } from '../../constants/contacts-constants.js';
-import { setUpdateSettings } from '../hooks.js';
 
 const contactSchema = new Schema(
   {
@@ -23,6 +22,7 @@ const contactSchema = new Schema(
       enum: contactTypes,
       default: 'personal',
     },
+    userId: { type: Schema.Types.ObjectId, ref: 'user' },
   },
   { timestamps: true, versionKey: false },
 );
