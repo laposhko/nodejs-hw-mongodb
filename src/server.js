@@ -8,11 +8,13 @@ import { initMongoDB } from './db/initMongoDB.js';
 import contactsRouter from './routers/contacts-router.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { UPLOAD_DIR } from './constants/contacts-constants.js';
 
 const PORT = Number(env('PORT', '3000'));
 function setupServer() {
   initMongoDB();
   const app = express();
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   // const logger = pino({ transport: { target: 'pino-pretty' } });
   // app.use(logger);

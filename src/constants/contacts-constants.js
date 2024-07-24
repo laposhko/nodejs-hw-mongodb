@@ -28,3 +28,6 @@ export const REFRESH_TOKEN_LIFETIME = 7 * 24 * 3600 * 1000;
 // };
 
 export const TEMPLATES_DIR = path.join(process.cwd(), 'src', 'templates');
+
+export const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'temp');
+export const UPLOAD_DIR = path.join(process.cwd(), 'uploads');

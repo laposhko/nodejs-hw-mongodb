@@ -9,8 +9,10 @@ import createHttpError from 'http-errors';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseContactFilterParams } from '../utils/parseContactFilterParams.js';
-// import { createContactSchema } from '../validation/contacts.js';
 
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import env from '../utils/env.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
 export const getAllContactsController = async (req, res, next) => {
   const userId = req.user._id;
   const { normalizedPage: page, normalizedPerPage: perPage } =
@@ -54,10 +56,21 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
+  const photo = req.file;
+  let photoUrl;
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
   const newContact = {
     ...req.body,
     userId: req.user._id,
+    photo: photoUrl,
   };
+
   const contact = await createContact(newContact);
   res.status(201).json({
     status: 201,
@@ -79,9 +92,22 @@ export const deleteContactController = async (req, res, next) => {
 
 export const upsertContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
+  let photoUrl;
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
   const userId = req.user._id;
 
-  const result = await upsertContact(contactId, userId, req.body, {
+  const data = {
+    ...req.body,
+    photo: photoUrl,
+  };
+  const result = await upsertContact(contactId, userId, data, {
     upsert: true,
   });
   if (!result) {
@@ -98,8 +124,20 @@ export const upsertContactController = async (req, res, next) => {
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const userId = req.user._id;
-
-  const result = await upsertContact(contactId, userId, req.body);
+  const photo = req.file;
+  let photoUrl;
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+  const data = {
+    ...req.body,
+    photo: photoUrl,
+  };
+  const result = await upsertContact(contactId, userId, data);
   if (!result) {
     next(createHttpError(404, 'Contact not found'));
     return;

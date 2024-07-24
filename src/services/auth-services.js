@@ -9,6 +9,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { TEMPLATES_DIR } from '../constants/contacts-constants.js';
 import bcrypt from 'bcryptjs';
+import { deleteSession } from './session-services.js';
 export const findUser = (filter) => UsersCollection.findOne(filter);
 export const registerUser = async (payload) => {
   const user = await UsersCollection.create({
@@ -19,9 +20,7 @@ export const registerUser = async (payload) => {
 };
 
 export const requestResetToken = async (email) => {
-  console.log('service work');
   const user = await UsersCollection.findOne({ email });
-  console.log(user);
   if (!user) {
     throw createHttpError(404, 'User not found');
   }
@@ -49,12 +48,19 @@ export const requestResetToken = async (email) => {
     link: `${env('APP_DOMAIN')}/reset-pwd?token=${resetToken}`,
   });
 
-  await sendEmail({
-    from: env('SMTP_FROM'),
-    to: email,
-    subject: 'Reset your password',
-    html,
-  });
+  try {
+    await sendEmail({
+      from: env('SMTP_FROM'),
+      to: email,
+      subject: 'Reset your password',
+      html,
+    });
+  } catch (error) {
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
 };
 
 export const resetPassword = async (payload) => {
@@ -63,8 +69,9 @@ export const resetPassword = async (payload) => {
   try {
     entries = jwt.verify(payload.token, env('JWT_SECRET'));
   } catch (err) {
-    if (err instanceof Error) throw createHttpError(401, err.message);
-    throw err;
+    throw createHttpError(401, 'Token is expired or invalid.');
+    // if (err instanceof Error) throw createHttpError(401, err.message);
+    // throw err;
   }
 
   const user = await UsersCollection.findOne({
@@ -75,11 +82,11 @@ export const resetPassword = async (payload) => {
   if (!user) {
     throw createHttpError(404, 'User not found');
   }
-  console.log(payload.password);
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
   await UsersCollection.updateOne(
     { _id: user._id },
     { password: encryptedPassword },
   );
+  await deleteSession({ userId: user._id });
 };
