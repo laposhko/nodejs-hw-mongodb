@@ -9,12 +9,14 @@ import contactsRouter from './routers/contacts-router.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { UPLOAD_DIR } from './constants/contacts-constants.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 const PORT = Number(env('PORT', '3000'));
 function setupServer() {
   initMongoDB();
   const app = express();
   app.use('/uploads', express.static(UPLOAD_DIR));
+  app.use('/api-docs', swaggerDocs());
 
   // const logger = pino({ transport: { target: 'pino-pretty' } });
   // app.use(logger);
